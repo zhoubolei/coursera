@@ -1,0 +1,84 @@
+import sys
+import json
+
+
+def getsentimentdict(f):
+	with open(f) as afinnfile:
+		scores = {}
+		for line in afinnfile:
+			term, score = line.split("\t")
+			scores[term] = int(score)
+	#print scores.items()
+	return scores
+
+def gettwitterdata(f):
+	twitterSet = []	
+	with open(f) as twitterfile:
+		for line in twitterfile:
+			twitterSet.append(json.loads(line))
+	return twitterSet
+	
+def computeSentiment(words, sentimentDict):
+	sentimentscore = 0.0
+	for word in words:
+		if word in sentimentDict:
+			sentimentscore += sentimentDict[word]
+	return sentimentscore	
+
+def main():
+	sent_file = sys.argv[1]
+	tweet_file = sys.argv[2]  
+	sentimentDict = getsentimentdict(sent_file)
+	twitterSet = gettwitterdata(tweet_file)
+	state_happiness = {}
+	state_count = {}
+	for i in range(len(twitterSet)):
+		if "text" in twitterSet[i]:		
+			words = twitterSet[i]["text"].split()	
+			
+			try:
+				if twitterSet[i]["place"]["country_code"] == "US" and twitterSet[i]["place"]["place_type"] == "city" :
+					curState = twitterSet[i]["place"]["full_name"].split().pop()
+					curSentiment = computeSentiment(words, sentimentDict)
+					#print curState, curSentiment
+					if curState in state_happiness:
+						state_happiness[curState] += curSentiment
+						state_count[curState] += 1
+					else:
+						state_happiness[curState] = curSentiment	
+						state_count[curState] = 1
+					#print curState, curSentiment
+
+			except(KeyError, TypeError):
+				pass
+			
+	happiest_state = ""
+	#print state_happiness.keys()
+	
+		
+
+	for state in state_happiness:			
+		state_happiness[state] = state_happiness[state] / float(state_count[state])	
+		try:
+			if state_happiness[state] > state_happiness[happiest_state]:
+				happiest_state= state
+		except(KeyError):
+			happiest_state = state
+	print happiest_state
+	
+	count = 100
+	for state in sorted(state_happiness, key = state_happiness.get, reverse = True):
+		print state, state_happiness[state]
+		count -= 1
+		if count <= 0:
+			break
+		
+
+if __name__ == '__main__':   
+	main()
+	#my = getsentimentdict()
+
+
+
+
+

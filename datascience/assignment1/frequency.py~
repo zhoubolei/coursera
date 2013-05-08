@@ -1,0 +1,36 @@
+import sys
+import json
+
+def gettwitterdata(f):
+	twitterSet = []	
+	with open(f) as twitterfile:
+		for line in twitterfile:
+			twitterSet.append(json.loads(line))
+	return twitterSet
+	
+def main():
+	tweet_file = sys.argv[1]
+	twitterSet = gettwitterdata(tweet_file)
+	wordDict = {}
+	sumWord = 0.00
+	for i in range(len(twitterSet)):
+		if "text" in twitterSet[i]:		
+			words = twitterSet[i]["text"].encode('utf-8').split()
+			for word in words:
+				word.lower()
+				sumWord += 1.00
+				if word in wordDict:
+					wordDict[word] += 1.00
+				else:
+					wordDict[word] = 1.00
+	for word in wordDict:
+		wordDict[word] = wordDict[word] / sumWord
+		#print word, wordDict[word]
+	count = 40
+	for word in sorted(wordDict, key = wordDict.get, reverse = True):
+		print word, wordDict[word]
+		count -= 1
+		if count < 0:
+			break
+if __name__ == '__main__':
+	main()
