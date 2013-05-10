@@ -44,8 +44,9 @@ def iterDict(twitterSet, sentimentDict):
 						sentimentscore += sentimentDict_new[word]
 				if sentimentword_num > 0:
 					average_sentimentscore = sentimentscore / sentimentword_num
-					for word in words:
-						word.lower()
+				for word in words:
+					word.lower()
+					if word not in sentimentDict:	
 						sentimentDict_new[word] = average_sentimentscore
 	return sentimentDict_new
 if __name__ == '__main__':
