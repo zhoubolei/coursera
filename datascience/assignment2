@@ -1,0 +1,19 @@
+SELECT SUM(A.value * B.value)
+FROM A JOIN B ON A.col_num = B.row_num
+WHERE A.row_num = 2 and B.col_num = 3;
+
+SELECT sum(docA.count * docB.count)
+FROM frequency docA, frequency docB 
+WHERE docA.docid = "10080_txt_crude" and docB.docid = "17035_txt_earn"
+AND docA.term = docB.term;
+
+CREATE VIEW curQuery AS
+SELECT 'q' as docid, 'washington' as term, 1 as count 
+UNION
+SELECT 'q' as docid, 'taxes' as term, 1 as count
+UNION 
+SELECT 'q' as docid, 'treasury' as term, 1 as count;
+SELECT frequency.docid, sum(frequency.count * curQuery.count)
+FROM frequency JOIN curQuery ON frequency.term = curQuery.term
+GROUP BY frequency.docid
+ORDER BY sum(frequency.count * curQuery.count);
